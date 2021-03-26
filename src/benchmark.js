@@ -7,7 +7,7 @@ class BenchmarkSuite {
     this.benchmarks = []
   }
 
-  add(title, tests, assertResult, pMaxTime = 1, pMaxOperations = 1000000000) {
+  add(title, tests, assertResult, pMaxTime = 1, pMaxOperations = 1000000) {
     const benchmark = {
       title,
       tests,
