@@ -41,7 +41,7 @@ function updateTodos(benchmarkSuite, listSize, modifySize) {
   benchmarkSuite.add(
     `Update todos list (${modifySize} items out of ${listSize})`,
     [
-      ['es2015', () => {
+      ['es2015', function es2015Test() {
         const [start, end] = randomBounds()
         const stateCopy = [...baseState]
         for (let i = start; i < end; i++) {
@@ -49,13 +49,13 @@ function updateTodos(benchmarkSuite, listSize, modifySize) {
         }
         return stateCopy
       }],
-      ['immutable', () => {
+      ['immutable', function immutableTest() {
         const [start, end] = randomBounds()
         immutableState.withMutations(state => {
           for (let i = start; i < end; i++) state.setIn([i, 'done'], true)
         })
       }],
-      ['seamless', () => {
+      ['seamless', function seamlessTest() {
         const [start, end] = randomBounds()
         return seamlessState
           .slice(0, start)
@@ -65,37 +65,37 @@ function updateTodos(benchmarkSuite, listSize, modifySize) {
             seamlessState.slice(end),
           )
       }],
-      ['immer', () => {
+      ['immer', function immerTest() {
         const [start, end] = randomBounds()
         return immer(baseState, draft => {
           for (let i = start; i < end; i++) draft[i].done = true
         })
       }],
-      ['qim', () => {
+      ['qim', function qimTest() {
         const [start, end] = randomBounds()
         return qim.set([qim.$slice(start, end), qim.$each, 'done'], true, baseState)
       }],
-      ['immutadot1', () => {
+      ['immutadot1', function immutadot1Test() {
         const [start, end] = randomBounds()
         return set1(baseState, `[${start}:${end}].done`, true)
       }],
-      ['immutadot2', () => {
+      ['immutadot2', function immutadot2Test() {
         const [start, end] = randomBounds()
         return set2(baseState, `[${start}:${end}].done`, true)
       }],
-      ['immutadot3', () => {
+      ['immutadot3', function immutadot3Test() {
         const [start, end] = randomBounds()
         return set3`${baseState}[${start}:${end}].done`(true)
       }],
-      ['qim-curried', () => {
+      ['qim-curried', function qimCurriedTest() {
         const [start, end] = randomBounds()
         return qim.set([qim.$slice(start, end), qim.$each, 'done'])(true)(baseState)
       }],
-      ['immutadot2-curried', () => {
+      ['immutadot2-curried', function immutadot2CurriedTest() {
         const [start, end] = randomBounds()
         return set2(`[${start}:${end}].done`)(true)(baseState)
       }],
-      ['immutadot3-curried', () => {
+      ['immutadot3-curried', function immutadot3CurriedTest() {
         const [start, end] = randomBounds()
         return set3`[${start}:${end}].done`(true)(baseState)
       }],
