@@ -21,13 +21,11 @@ const benchmarkSuite = new BenchmarkSuite(
   ],
 )
 
-describe('Benchmark suite', () => {
-  describe('Set a property', () => setProp(benchmarkSuite))
-  describe('Set a deeply nested property', () => setDeepProp(benchmarkSuite))
-  describe('Update small todos list', () => updateTodos(benchmarkSuite, 'Update small todos list (1000 items)', 1000, 100))
-  describe('Update medium todos list', () => updateTodos(benchmarkSuite, 'Update medium todos list (10000 items)', 10000, 1000))
-  describe('Update large todos list', () => updateTodos(benchmarkSuite, 'Update large todos list (100000 items)', 100000, 10000))
-  describe('Push values in an array', () => pushInArray(benchmarkSuite))
+setProp(benchmarkSuite)
+setDeepProp(benchmarkSuite)
+updateTodos(benchmarkSuite, 1000, 100)
+updateTodos(benchmarkSuite, 10000, 1000)
+updateTodos(benchmarkSuite, 100000, 10000)
+pushInArray(benchmarkSuite)
 
-  afterAll(() => benchmarkSuite.log())
-})
+benchmarkSuite.runAndLog()

@@ -26,93 +26,44 @@ function pushInArray(benchmarkSuite) {
   // Disable immer auto freeze
   setAutoFreeze(false)
 
-  const benchmark = benchmarkSuite.createBenchmark(
+  const benchmark = benchmarkSuite.add(
     'Push values in array',
+    [
+      ['es2015', () => {
+        return {
+          ...baseState,
+          nested: {
+            ...baseState.nested,
+            prop: [...baseState.nested.prop, 4, 5, 6],
+          },
+        }
+      }],
+      ['immutable', () => {
+        immutableState.updateIn(['nested', 'prop'], prop => [...prop, 4, 5, 6])
+      }],
+      ['seamless', () => Seamless.updateIn(seamlessState, ['nested', 'prop'], prop => [...prop, 4, 5, 6])],
+      ['immer', () => immer(baseState, draft => {
+        draft.nested.prop.push(4, 5, 6)
+      })],
+      ['qim', () => qim.set(['nested', 'prop', qim.$end], [4, 5, 6], baseState)],
+      ['immutadot1', () => push1(baseState, 'nested.prop', 4, 5, 6)],
+      ['immutadot2', () => push2(baseState, 'nested.prop', 4, 5, 6)],
+      ['immutadot3', () => push3`${baseState}.nested.prop`(4, 5, 6)],
+      ['qim-curried', () => qim.set(['nested', 'prop', qim.$end])([4, 5, 6])(baseState)],
+      ['immutadot2-curried', () => push2('nested.prop')(4, 5, 6)(baseState)],
+      ['immutadot3-curried', () => push3`.nested.prop`(4, 5, 6)(baseState)],
+    ],
     (key, result) => {
       if (key === 'immutable') return
-      expect(result).toEqual({
-        nested: {
-          prop: [1, 2, 3, 4, 5, 6],
-          otherProp: 'aze',
-        },
-        other: { prop: 'baz' },
-      })
+      // expect(result).toEqual({
+      //   nested: {
+      //     prop: [1, 2, 3, 4, 5, 6],
+      //     otherProp: 'aze',
+      //   },
+      //   other: { prop: 'baz' },
+      // })
     },
   )
-
-  it('es2015', () => {
-    benchmark('es2015', () => {
-      return {
-        ...baseState,
-        nested: {
-          ...baseState.nested,
-          prop: [...baseState.nested.prop, 4, 5, 6],
-        },
-      }
-    })
-  })
-
-  it('immutable', () => {
-    benchmark('immutable', () => {
-      immutableState.updateIn(['nested', 'prop'], prop => [...prop, 4, 5, 6])
-    })
-  })
-
-  it('seamless', () => {
-    benchmark('seamless', () => {
-      return Seamless.updateIn(seamlessState, ['nested', 'prop'], prop => [...prop, 4, 5, 6])
-    })
-  })
-
-  it('immer', () => {
-    benchmark('immer', () => {
-      return immer(baseState, draft => {
-        draft.nested.prop.push(4, 5, 6)
-      })
-    })
-  })
-
-  it('qim', () => {
-    benchmark('qim', () => {
-      return qim.set(['nested', 'prop', qim.$end], [4, 5, 6], baseState)
-    })
-  })
-
-  it('immutadot 1', () => {
-    benchmark('immutadot1', () => {
-      return push1(baseState, 'nested.prop', 4, 5, 6)
-    })
-  })
-
-  it('immutadot 2', () => {
-    benchmark('immutadot2', () => {
-      return push2(baseState, 'nested.prop', 4, 5, 6)
-    })
-  })
-
-  it('immutadot 3', () => {
-    benchmark('immutadot3', () => {
-      return push3`${baseState}.nested.prop`(4, 5, 6)
-    })
-  })
-
-  it('qim curried', () => {
-    benchmark('qim-curried', () => {
-      return qim.set(['nested', 'prop', qim.$end])([4, 5, 6])(baseState)
-    })
-  })
-
-  it('immutadot 2 curried', () => {
-    benchmark('immutadot2-curried', () => {
-      return push2('nested.prop')(4, 5, 6)(baseState)
-    })
-  })
-
-  it('immutadot 3 curried', () => {
-    benchmark('immutadot3-curried', () => {
-      return push3`.nested.prop`(4, 5, 6)(baseState)
-    })
-  })
 }
 
 module.exports = {
