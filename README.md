@@ -2,6 +2,19 @@
 
 This is a benchmarking package for [immutadot](https://github.com/zenika-open-source/immutadot).
 
+## Running
+
+```sh
+# Install dependencies
+yarn
+
+# Run the benchmarks
+yarn start
+
+# Or if you're in a hurry...
+yarn start:fast
+```
+
 ## Results
 
 |  | ES2015 destructuring | immutable 4.0.0-rc.12 | seamless-immutable 7.1.4 | immer 9.0.1 | qim 0.0.52 | qim 0.0.52 curried | immutadot 1.0.0 | immutadot 2.0.0 | immutadot 2.0.0 curried | immutadot 3.0.0 | immutadot 3.0.0 curried |
