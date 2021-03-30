@@ -53,16 +53,6 @@ function pushInArray(benchmarkSuite) {
       ['immutadot2-curried', () => push2('nested.prop')(4, 5, 6)(baseState)],
       ['immutadot3-curried', () => push3`.nested.prop`(4, 5, 6)(baseState)],
     ],
-    (key, result) => {
-      if (key === 'immutable') return
-      // expect(result).toEqual({
-      //   nested: {
-      //     prop: [1, 2, 3, 4, 5, 6],
-      //     otherProp: 'aze',
-      //   },
-      //   other: { prop: 'baz' },
-      // })
-    },
   )
 }
 

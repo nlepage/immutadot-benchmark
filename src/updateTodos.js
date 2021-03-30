@@ -45,7 +45,7 @@ function updateTodos(benchmarkSuite, listSize, modifySize) {
         const [start, end] = randomBounds()
         const stateCopy = [...baseState]
         for (let i = start; i < end; i++) {
-          stateCopy[i] = { ...stateCopy[i], done: true }
+          stateCopy[i] = { ...baseState[i], done: true }
         }
         return stateCopy
       }],
@@ -100,17 +100,6 @@ function updateTodos(benchmarkSuite, listSize, modifySize) {
         return set3`[${start}:${end}].done`(true)(baseState)
       }],
     ],
-    (key, result) => {
-      if (key === 'immutable') return
-      // let trues = 0, falses = 0
-      // result.forEach(todo => todo.done ? trues++ : falses++)
-      // expect(trues).toBe(modifySize)
-      // expect(falses).toBe(unmodifiedSize)
-      // trues = falses = 0
-      // baseState.forEach(todo => todo.done ? trues++ : falses++)
-      // expect(trues).toBe(0)
-      // expect(falses).toBe(listSize)
-    },
   )
 }
 

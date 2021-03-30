@@ -124,56 +124,6 @@ function setDeepProp(benchmarkSuite) {
       ['immutadot2-curried', () => set2('nested1.arr1[0].nested2.arr2[0].nested3.arr3[0].nested4.arr4[0].nested5.arr5[0].nested6.arr6[0].prop')('bar')(baseState)],
       ['immutadot3-curried', () => set3`.nested1.arr1[0].nested2.arr2[0].nested3.arr3[0].nested4.arr4[0].nested5.arr5[0].nested6.arr6[0].prop`('bar')(baseState)],
     ],
-    (key, result) => {
-      if (key === 'immutable') return
-      // expect(result).toEqual({
-      //   nested1: {
-      //     arr1: [
-      //       {
-      //         nested2: {
-      //           arr2: [
-      //             {
-      //               nested3: {
-      //                 arr3: [
-      //                   {
-      //                     nested4: {
-      //                       arr4: [
-      //                         {
-      //                           nested5: {
-      //                             arr5: [
-      //                               {
-      //                                 nested6: {
-      //                                   arr6: [
-      //                                     {
-      //                                       prop: 'bar',
-      //                                       otherProp: 'aze',
-      //                                     },
-      //                                   ],
-      //                                   otherProp: 'aze6',
-      //                                 },
-      //                               },
-      //                             ],
-      //                             otherProp: 'aze5',
-      //                           },
-      //                         },
-      //                       ],
-      //                       otherProp: 'aze4',
-      //                     },
-      //                   },
-      //                 ],
-      //                 otherProp: 'aze3',
-      //               },
-      //             },
-      //           ],
-      //           otherProp: 'aze2',
-      //         },
-      //       },
-      //     ],
-      //     otherProp: 'aze1',
-      //   },
-      //   other: { prop: 'baz' },
-      // })
-    },
   )
 }
 

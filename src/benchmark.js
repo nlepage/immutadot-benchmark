@@ -1,5 +1,6 @@
-const fast = Boolean(process.env.FAST)
+const { performance } = require('perf_hooks')
 
+const fast = Boolean(process.env.FAST)
 class BenchmarkSuite {
   constructor(reference, contestants) {
     this.reference = reference
@@ -7,13 +8,12 @@ class BenchmarkSuite {
     this.benchmarks = []
   }
 
-  add(title, tests, assertResult, pMaxTime = 1, pMaxOperations = 1000000) {
+  add(title, tests, pMaxDuration = 1000, pMaxIterations = 1000000) {
     const benchmark = {
       title,
       tests,
-      assertResult,
-      maxTime: fast ? pMaxTime / 3 : pMaxTime,
-      maxOperations: fast ? Math.round(pMaxOperations / 3) : pMaxOperations
+      maxDuration: fast ? pMaxDuration / 3 : pMaxDuration,
+      maxIterations: fast ? Math.round(pMaxIterations / 3) : pMaxIterations
     }
 
     this.benchmarks.push(benchmark)
@@ -28,61 +28,43 @@ class BenchmarkSuite {
     for (const benchmark of this.benchmarks) {
       const benchmarkResults = {}
       for (const [key, fn] of benchmark.tests) {
-        benchmarkResults[key] = this.runTest(key, fn, benchmark.assertResult, benchmark.maxTime, benchmark.maxOperations)
+        benchmarkResults[key] = this.runTest(fn, benchmark.maxDuration, benchmark.maxIterations)
       }
       suiteResults.push([benchmark.title, benchmarkResults])
     }
     return suiteResults
   }
 
-  runTest(key, fn, assertResult, maxTime, maxOperations) {
-    const startTime = Date.now()
-    const maxTimeMs = Math.round(maxTime * 1000)
+  runTest(fn, maxDuration, maxIterations) {
+    const maxDuration10th = maxDuration / 10
 
-    const startingTime = maxTimeMs / 100 // Starting time is a hundredth of max time
-    let startingIterations = 1
-    let startingOperations = 0
+    let totalIterations = 0
+    let iterations = 1
 
-    while (Date.now() - startTime < startingTime) {
-      let iterations = startingIterations
-      startingIterations *= 2
-      startingOperations += iterations
-
-      while (iterations--) fn()
-    }
-
-    const maxRunTime = Math.round(maxTimeMs / 10) // Max run time is a tenth of max time
-    const limitEndTime = startTime + maxTimeMs
-
-    const getIterations = (measuredOperations, measuredTime) => Math.min(
-      // Either enough operations to consume max run time or remaining time
-      Math.ceil(Math.min(maxRunTime, Math.max(limitEndTime - Date.now(), 0)) / (measuredTime / measuredOperations)),
-      // Or enough operations to reach max operations
-      maxOperations - measuredOperations,
-    )
-
-    let nbOperations = 0
-    let totalTime = 0
-    let iterations = getIterations(startingOperations, Date.now() - startTime)
+    const startTime = performance.now()
+    const endTime = startTime + maxDuration
 
     while (iterations > 0) {
-      nbOperations += iterations
+      totalIterations += iterations
 
-      const runStartTime = Date.now()
-      while (iterations--) {
-        if (assertResult && iterations % 100 === 0)
-          assertResult(key, fn())
-        else
-          fn()
-      }
-      totalTime += Date.now() - runStartTime
+      while (iterations--) fn()
 
-      iterations = getIterations(nbOperations, totalTime)
+      const remainingDuration = endTime - performance.now()
+      const nextBatchTime = Math.min(maxDuration10th, remainingDuration)
+      const elapsedTime = performance.now() - startTime
+      const averageIterationTime = elapsedTime / totalIterations
+      // either approximately enough iterations to use a tenth of max duration
+      const enoughIterationsForMaxDuration = nextBatchTime / averageIterationTime
+      // or enough iterations to reach max iterations...
+      const enoughIterationsForMaxIterations = maxIterations - totalIterations
+      iterations = Math.floor(Math.min(enoughIterationsForMaxDuration, enoughIterationsForMaxIterations))
     }
+
+    const totalTime = performance.now() - startTime
 
     return {
       totalTime,
-      nbOperations,
+      totalIterations,
     }
   }
 
@@ -101,8 +83,8 @@ class BenchmarkSuite {
 
   printResult(result, reference) {
     if (result === undefined) return 'No run'
-    const { totalTime, nbOperations } = result
-    const opTime = totalTime / nbOperations
+    const { totalTime, totalIterations } = result
+    const opTime = totalTime / totalIterations
 
     let formattedOpTime
     if (opTime < 0.001) {
@@ -115,9 +97,9 @@ class BenchmarkSuite {
       formattedOpTime = `${(opTime).toFixed(3 - Math.ceil(Math.log10(opTime)))}ms`
     }
 
-    const score = Math.round(nbOperations * 100 * reference.totalTime / totalTime / reference.nbOperations)
+    const score = Math.round(totalIterations * 100 * reference.totalTime / totalTime / reference.totalIterations)
 
-    return `${score} <br> ${Math.round(nbOperations * 1000 / totalTime)}ops/s (${formattedOpTime}/op)`
+    return `${score} <br> ${Math.round(totalIterations * 1000 / totalTime)}ops/s (${formattedOpTime}/op)`
   }
 }
 

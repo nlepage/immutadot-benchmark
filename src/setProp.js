@@ -51,17 +51,6 @@ function setProp(benchmarkSuite) {
       ['immutadot2-curried', () => set2('nested.prop')('bar')(baseState)],
       ['immutadot3-curried', () => set3`.nested.prop`('bar')(baseState)],
     ],
-    (key, result) => {
-      if (key === 'immutable') return
-      // FIXME
-      // expect(result).toEqual({
-      //   nested: {
-      //     prop: 'bar',
-      //     otherProp: 'aze',
-      //   },
-      //   other: { prop: 'baz' },
-      // })
-    },
   )
 }
 
